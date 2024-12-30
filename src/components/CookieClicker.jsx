@@ -5,7 +5,7 @@ import { useState } from "react";
 import Shop from "./Shop";
 
 function CookieClicker(){
-    const helperLevel = 0.5;
+    const helperLevel = 5;
     const levelAmount = 5;
     const [score, setScore] = useState(0);
     const [helper, setHelper] = useState(10);
