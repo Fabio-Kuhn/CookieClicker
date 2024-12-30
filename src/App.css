@@ -3,10 +3,13 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden;
+  font-family: "Libre Baskerville", serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 body {
-  background-color: red;
+  background-color: #B2ADA4;
   display: flex;
   justify-content: center;
   align-items: center; 
@@ -54,3 +57,49 @@ body {
   bottom: 0;
 }
 
+h2{
+  text-align: center;
+  height: 50%;
+  margin: 0;
+  position: relative;
+  top: 25%;
+}
+
+.left-aligned{
+  text-align: left;
+  margin-left: 20px;
+}
+
+.shopContainer{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20vw;
+  height: 100vh;
+  background-color: white;
+  border-right: 1px solid black;
+  border-radius: 0 2% 2% 0; 
+} 
+
+.shop-row-container{
+  box-sizing: border-box;
+  width: 100%;
+  border-top: 1px solid black;
+  padding-left: 10px;
+}
+
+.shop-row-title{
+  margin: 0px;
+  margin-left: 2px;
+}
+
+
+.shop-item{
+  display: inline-flex;
+  box-sizing: border-box;
+  background-color: gray;
+  border: 1px solid white;
+  width: 70px;
+  margin: 2px;
+
+}
