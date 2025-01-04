@@ -1,9 +1,10 @@
 import React from "react";
-import PerkDisplayRow from "./PerkDisplayRow";
+import PerkDisplayContainer from "./PerkDisplayContainer";
 
-function Perks(){
-    return <div className="demonstration"><h2 className="left-aligned">Perks</h2>
-        <PerkDisplayRow />
+function Perks(props){
+    return <div className="perks demonstration"><h2 className="left-aligned">Perks</h2>
+        <PerkDisplayContainer helpers={props.helpers} potion={props.potion} potionTime={props.potionTime} shieldTime={props.shieldTime} shieldActive={props.shieldActive}/> 
+        {props.helperLevel > 2 && <p className="helper-level-display">x {props.helperLevel}</p>}
     </div>
 }
 

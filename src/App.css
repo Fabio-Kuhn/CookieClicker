@@ -6,13 +6,20 @@ html, body {
   font-family: "Libre Baskerville", serif;
   font-weight: 400;
   font-style: normal;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 body {
   background-color: #B2ADA4;
-  display: flex;
-  justify-content: center;
-  align-items: center; 
+  background-image: url('../public/backery.webp');
+  margin: 0; 
+  height: 100vh; 
+  position: relative; 
 }
 
 .cookieOutline {
@@ -21,10 +28,27 @@ body {
   border-radius: 50%;
   background-image: url('../public/cookie.png'); 
   background-size: cover;
+  position: absolute; 
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%); 
+  z-index: 2;
 }
 
 .cookieOutline:hover {
   cursor: pointer;
+}
+
+.shield{
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 1px solid black;
+  position: absolute; 
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%);
+
 }
 
 .scoreboard {
@@ -39,6 +63,7 @@ body {
   border-radius: 20px 20px 20px 20px;
   align-items: center;
   justify-content: center;
+  z-index: 3;
 }
 
 .demonstration{
@@ -74,7 +99,7 @@ h2{
   position: absolute;
   top: 0;
   left: 0;
-  width: 20vw;
+  width: 170px;
   height: 100vh;
   background-color: white;
   border-right: 1px solid black;
@@ -97,14 +122,130 @@ h2{
 .shop-item{
   display: inline-flex;
   box-sizing: border-box;
-  background-color: gray;
+  background-color: rgb(128, 128, 128);
   border: 1px solid white;
+  flex-direction: column;
   width: 70px;
+  height: 70px;
   margin: 2px;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.shop-item:hover{
+  background-color: rgb(158, 158, 158);
+}
+
+.shop-item-disabled{
+  background-color: red;
+  cursor: not-allowed;
+}
+
+.shop-item-disabled:hover{
+  background-color: red;
+}
+
+.shop-item-name{
+  font-family: sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .perk-display{
-  width: 100px;
+  width: 25px;
   height: 50px;
   background-color: black;
+  box-sizing: border-box;
+  border: 1px solid white;
+  margin-left: 5px;
 }
+
+.helper-display-row{
+  display: inline-flex;
+  flex-direction: row-reverse;
+  height: 50px;
+  width: 90px;
+  border: 1px solid black;
+  
+}
+
+.perk-display-row{
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 50px;
+  width: 50px;
+  border: 1px solid black;
+}
+
+.perk-display-row p{
+  margin: 0;
+  text-align: center;
+  width: 100%;
+  font-family: sans-serif;
+  font-weight: 900;
+}
+
+.shield-display-row{
+  position: absolute;
+  left: 0;
+}
+
+.perk-name{
+  font-size: 20px;
+}
+
+
+.perk-display-container{
+  display: inline-flex;
+  flex-direction: row-reverse;
+  border: 1px solid black;
+  width: 190px;
+  height: 50px;
+  position: absolute;
+  right: 66.666%;
+  top: -30px;
+}
+
+.helper-level-display{
+  position: absolute;
+  right: 69%;
+  top: 7px;
+}
+
+@keyframes moveToCenter {
+  from {
+    transform: translate(0, 0); /* Start from the current position */
+  }
+  to {
+    transform: translate(
+      calc(50vw - var(--elmo-start-x) - 50%),
+      calc(50vh - var(--elmo-start-y) - 50%)
+    ); 
+  }
+}
+
+.elmo{
+  cursor: pointer;
+  height: 55px;
+  width: 60px;
+  background-image: url('../public/elmo.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: absolute;
+  z-index: 1;
+  --elmo-start-x: 0px; 
+  --elmo-start-y: 0px; 
+  animation: moveToCenter 4s ease-in-out forwards;
+}
+
