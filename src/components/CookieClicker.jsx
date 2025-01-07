@@ -6,9 +6,10 @@ import Shop from "./Shop";
 import Shield from "./Shield";
 import Elmo from "./Elmo";
 
+
 function CookieClicker(){
     const levelAmount = 5;
-    const [score, setScore] = useState(999);
+    const [score, setScore] = useState(0);
     const [helper, setHelper] = useState(0);
     const [level, setLevel] = useState(1);
     const [helperLevel, setHelperLevel] = useState(2);
@@ -16,6 +17,14 @@ function CookieClicker(){
     const [shieldActive, setShieldActive] = useState(false);
     const [shieldTime, setShieldTime] = useState(0);
     const [elmos, setElmos] = useState([]);
+    const [elmoRender, setElmoRender] = useState(0);
+    const [seconds, setSeconds] = useState(0);
+    const [elmoSec, setElmoSec] = useState(0);
+    const [elmoCollision, setElmoCollision] = useState(false);
+    
+
+    const elmoEffectLevel = 2;
+    const elmoEffectTime = 10;
     const upgradeHelperPrice = 250;
     const buyHelperPrice = 100;
     const timesTwoPotionPrice = 50;
@@ -212,8 +221,10 @@ function CookieClicker(){
             }
         } else if (score >= 1000 - (1 * helperLevel * helper * potion) && level < levelAmount){
             setLevel(level + 1);
+            setElmos([]);
             setScore(0);
         } else if (score >= 1000 - (1 * helperLevel * helper * potion) && level === levelAmount){
+            setElmos([]);
             alert("Congratulations!!");
             setScore(0);
             setHelper(0);
@@ -224,55 +235,131 @@ function CookieClicker(){
         
     }
 
-    // function numberOfElmos(lvl){
-    //     return Math.floor(Math.random() * lvl) + 1;
-    // }
-   
-    // useEffect(() => {
-    //     const elmoData = Array.from({ length: 5 }, (_, index) => ({
-    //       id: `elmo${index + 1}`, 
-    //       left: `${Math.floor(Math.random() * 81) + 10}%`,
-    //       isAtCore: false,
-    //     }));
-    
-    //     setElmos(elmoData);
-    //   }, []);
-    
-    function calculateElmoStart(){
-        const elmoElements = document.querySelectorAll('.elmo');
-        elmoElements.forEach((elmo) => {
-          const rect = elmo.getBoundingClientRect();
-          const startX = rect.left;
-          elmo.style.setProperty('--elmo-start-x', `${startX}px`);
-          console.log(startX);
-        });
-      }; // This effect runs whenever `elmos` changes
+    useEffect(() => {
+        generateElmoArray();
+    }, [])
 
-    function createElmoArray(){
-        const elmoData = Array.from({ length: 5 }, (_, index) => ({
+    useEffect(() => {
+        generateElmoArray();
+    }, [level])
+
+    useEffect(() => {
+        const elmoElementsLength = document.querySelectorAll('.elmo').length;
+        const elmoElements = document.querySelectorAll('.elmo');
+        if(elmoElementsLength > 0){
+            elmoElements.forEach((elmo) => {
+                elmo.style.animation = 'none'; // Remove the animation
+                void elmo.offsetWidth;        // Force a reflow (browser recalculates styles)
+                elmo.style.animation = 'moveToCenter 4s ease-in-out forwards'; // Reapply the animation
+            });
+        }
+        calcElmoStartingPosition();
+        const interval = setInterval(() => {
+            setSeconds(prevSeconds => {
+            if (prevSeconds + 1 === 10000) {
+                clearInterval(interval); // Stop the interval when seconds reach 10
+            }
+            checkElmoCollision();
+            return prevSeconds + 1;
+            });
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [elmoRender])
+
+
+    function generateElmoArray(){
+        setElmos([]);
+        setElmoRender((prev) => prev + 1);
+        const elmoData = Array.from({ length: Math.floor(Math.random() * level + 1) }, (_, index) => ({
             id: `elmo${index + 1}`,
             left: `${Math.floor(Math.random() * 81) + 10}%`,
+            top: '0%',
             isAtCore: false,
+            active: true
           }));
-        setElmos(elmoData); 
+          setElmos(elmoData);
+          setElmoRender((prev) => prev + 1);
     }
-    
-      // Initial Elmo setup when component mounts
-      useEffect(() => {
-        createElmoArray();
-        calculateElmoStart();
-      }, []); // This effect runs only on initial mount
-    
-    function onElmoClick(id){
+
+    function onElmoClick(elmoId){
         setElmos((prev) => {
-            const updatedElmos = prev.filter((e) => e.id !== id);
+            const updatedElmos = prev.filter((e) => e.id !== elmoId);
             if (updatedElmos.length === 0) {
-              createElmoArray();
-              calculateElmoStart();
+                generateElmoArray();
             }
             return updatedElmos;
           });
+    }
+
+    function calcElmoStartingPosition(){
+        elmos.forEach((elmo) => {
+            const elmoElement = document.getElementById(elmo.id);
+            const rect = elmoElement.getBoundingClientRect();
+            const startX = rect.left;
+            elmoElement.style.setProperty('--elmo-start-x', `${startX}px`);
+            elmoElement.style.animation = 'none';
+            void elmoElement.offsetWidth; 
+            elmoElement.style.animation = 'moveToCenter 4s ease-in-out forwards';
+            });
+        
+    }
+
+    
+      
+
+    function checkElmoCollision(){
+        const elmo = document.querySelector('.elmo');
+        const cookieOutline = document.querySelector('.cookieOutline');
+        if (!elmo || !cookieOutline) return;
+        const elmoRect = elmo.getBoundingClientRect();
+        const cookieRect = cookieOutline.getBoundingClientRect();
+        const isColliding = !(
+            elmoRect.right < cookieRect.left + 30 ||
+            elmoRect.left > cookieRect.right + 30 ||
+            elmoRect.bottom < cookieRect.top + 30 ||
+            elmoRect.top > cookieRect.bottom + 30
+            );
+            if (isColliding && !elmoCollision) {
+                setElmoCollision(true);
+                const elmoId = elmo.getAttribute('id');
+                console.log("colission with " + elmoId);
+                onElmoClick(elmoId);
+                elmoEffectApplication();
+                
+                
+                 
+            } else if(isColliding){
+                const elmoId = elmo.getAttribute('id');
+                console.log('not changing state collision');
+                onElmoClick(elmoId);
+                
+            }
         };
+
+    function elmoEffectApplication(){
+        if(elmoCollision && !shieldActive){
+            const interval = setInterval(() => {
+                setElmoSec(prevSeconds => {
+                if (prevSeconds + 1 === elmoEffectTime) {
+                    setElmoCollision(false);
+                    clearInterval(interval); 
+                }
+                console.log(prevSeconds);
+                elmoEffect();
+                return prevSeconds + 1;
+                });
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }
+    
+
+    function elmoEffect(){
+        console.log('collission');
+    }
+    
+  
+    
     
     
 
@@ -289,7 +376,15 @@ function CookieClicker(){
                     shieldTime={shieldTime} shieldActive={shieldActive}
                     helperLevel={helperLevel}/>
         
-        {elmos.map((e, i) => <Elmo key={e.id} id={e.id} left={e.left} onClick={onElmoClick}/>)}
+        {elmos.map((e) => (
+        <Elmo
+          key={e.id}
+          id={e.id}
+          left={e.left}
+          onClick={onElmoClick} 
+        />
+      ))}
+        
         
         
         

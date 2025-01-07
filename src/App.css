@@ -223,9 +223,9 @@ h2{
   top: 7px;
 }
 
-@keyframes moveToCenter {
+ @keyframes moveToCenter {
   from {
-    transform: translate(0, 0); /* Start from the current position */
+    transform: translate(0, 0); 
   }
   to {
     transform: translate(
@@ -233,7 +233,7 @@ h2{
       calc(50vh - var(--elmo-start-y) - 50%)
     ); 
   }
-}
+} 
 
 .elmo{
   cursor: pointer;
@@ -248,4 +248,5 @@ h2{
   --elmo-start-y: 0px; 
   animation: moveToCenter 4s ease-in-out forwards;
 }
+
 
