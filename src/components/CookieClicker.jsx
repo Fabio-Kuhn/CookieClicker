@@ -1,7 +1,7 @@
 import React from "react";
 import Cookie from "./Cookie";
 import Scoreboard from "./Scoreboard";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Shop from "./Shop";
 import Shield from "./Shield";
 import Elmo from "./Elmo";
@@ -21,6 +21,10 @@ function CookieClicker(){
     const [seconds, setSeconds] = useState(0);
     const [elmoSec, setElmoSec] = useState(0);
     const [elmoCollision, setElmoCollision] = useState(false);
+    const shieldActiveRef = useRef(shieldActive);
+    const effectIntervalRef = useRef(null);
+
+    
     
 
     const elmoEffectLevel = 2;
@@ -257,7 +261,7 @@ function CookieClicker(){
         const interval = setInterval(() => {
             setSeconds(prevSeconds => {
             if (prevSeconds + 1 === 10000) {
-                clearInterval(interval); // Stop the interval when seconds reach 10
+                clearInterval(interval); 
             }
             checkElmoCollision();
             return prevSeconds + 1;
@@ -307,56 +311,93 @@ function CookieClicker(){
     
       
 
-    function checkElmoCollision(){
-        const elmo = document.querySelector('.elmo');
+    useEffect(() => {
+        shieldActiveRef.current = shieldActive; // Update the ref whenever shieldActive changes
+      }, [shieldActive]);
+
+
+      function checkElmoCollision() {
+        const elmos = document.querySelectorAll('.elmo');
         const cookieOutline = document.querySelector('.cookieOutline');
-        if (!elmo || !cookieOutline) return;
-        const elmoRect = elmo.getBoundingClientRect();
+        if (!cookieOutline) return;
+    
         const cookieRect = cookieOutline.getBoundingClientRect();
-        const isColliding = !(
+    
+        elmos.forEach(elmo => {
+          const elmoRect = elmo.getBoundingClientRect();
+          const isColliding = !(
             elmoRect.right < cookieRect.left + 30 ||
             elmoRect.left > cookieRect.right + 30 ||
             elmoRect.bottom < cookieRect.top + 30 ||
             elmoRect.top > cookieRect.bottom + 30
-            );
-            if (isColliding && !elmoCollision) {
-                setElmoCollision(true);
-                const elmoId = elmo.getAttribute('id');
-                console.log("colission with " + elmoId);
-                onElmoClick(elmoId);
-                elmoEffectApplication();
-                
-                
-                 
-            } else if(isColliding){
-                const elmoId = elmo.getAttribute('id');
-                console.log('not changing state collision');
-                onElmoClick(elmoId);
-                
+          );
+    
+          if (isColliding) {
+            const elmoId = elmo.getAttribute('id');
+            if (!elmoCollision && !shieldActiveRef.current) {
+              console.log("Effect starts");
+              setElmoCollision(true);
+              onElmoClick(elmoId);
+              elmoEffectApplication();
+            } else if (elmoCollision) {
+              console.log("Effect already applies");
+              onElmoClick(elmoId);
+            } else if (shieldActiveRef.current) {
+              console.log("Shield is active");
+              onElmoClick(elmoId);
             }
-        };
+          }
+        });
+      }
 
-    function elmoEffectApplication(){
-        if(elmoCollision && !shieldActive){
-            const interval = setInterval(() => {
-                setElmoSec(prevSeconds => {
-                if (prevSeconds + 1 === elmoEffectTime) {
-                    setElmoCollision(false);
-                    clearInterval(interval); 
-                }
-                console.log(prevSeconds);
-                elmoEffect();
-                return prevSeconds + 1;
-                });
-            }, 1000);
-            return () => clearInterval(interval);
+
+      function elmoEffectApplication() {
+        clearEffectInterval();
+        console.log("Effect starts");
+        const interval = setInterval(() => {
+          setElmoSec(prevSeconds => {
+            if (prevSeconds + 1 === elmoEffectTime) {
+              console.log("Effect over");
+              setElmoCollision(false);
+              clearEffectInterval(); 
+              return 0; 
+            }
+            elmoEffect(); 
+            return prevSeconds + 1; 
+          });
+        }, 1000);
+        effectIntervalRef.current = interval;
+      }
+      
+      function clearEffectInterval() {
+        if (effectIntervalRef.current) {
+          clearInterval(effectIntervalRef.current);
+          effectIntervalRef.current = null; 
         }
-    }
+      }
     
 
     function elmoEffect(){
-        console.log('collission');
+      setScore((prev) => {
+        if(prev - helperLevel >= 0){
+          return prev - helperLevel;
+        } else if(prev - helperLevel < 0){
+          setElmos([]);
+            alert("You loose :(");
+            setElmos([]);
+            setElmoCollision(false);
+            setScore(0);
+            setHelper(0);
+            setLevel(1);
+            enableShopItem("Helper", "+");
+            enableShopItem("Helper", "⬆");
+        }
+      });
     }
+
+    useEffect(() => {
+        return () => clearEffectInterval();
+      }, []);
     
   
     
@@ -374,7 +415,7 @@ function CookieClicker(){
         <Scoreboard score={score} level={level} levelAmount={levelAmount}
                     helpers={helper} potion={potion} potionTime={potionTime}
                     shieldTime={shieldTime} shieldActive={shieldActive}
-                    helperLevel={helperLevel}/>
+                    helperLevel={helperLevel} elmoTime={elmoEffectTime} elmoActive={elmoCollision}/> 
         
         {elmos.map((e) => (
         <Elmo

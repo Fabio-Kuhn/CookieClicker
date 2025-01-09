@@ -164,9 +164,11 @@ h2{
 .perk-display{
   width: 25px;
   height: 50px;
-  background-color: black;
+  background-image: url('../public/helper.PNG');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
   box-sizing: border-box;
-  border: 1px solid white;
   margin-left: 5px;
 }
 
@@ -175,20 +177,22 @@ h2{
   flex-direction: row-reverse;
   height: 50px;
   width: 90px;
-  border: 1px solid black;
-  
 }
 
 .perk-display-row{
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  justify-content: center; 
+  align-items: center; 
   height: 50px;
   width: 50px;
-  border: 1px solid black;
 }
 
 .perk-display-row p{
+  padding-top: 2px;
+  width: 48px;
+  height: 23px;
   margin: 0;
   text-align: center;
   width: 100%;
@@ -198,7 +202,7 @@ h2{
 
 .shield-display-row{
   position: absolute;
-  left: 0;
+  left: 50px;
 }
 
 .perk-name{
@@ -209,11 +213,11 @@ h2{
 .perk-display-container{
   display: inline-flex;
   flex-direction: row-reverse;
-  border: 1px solid black;
-  width: 190px;
+  width: 240px;
   height: 50px;
   position: absolute;
   right: 66.666%;
+  box-sizing: border-box;
   top: -30px;
 }
 
@@ -247,6 +251,20 @@ h2{
   --elmo-start-x: 0px; 
   --elmo-start-y: 0px; 
   animation: moveToCenter 4s ease-in-out forwards;
+}
+
+.elmo-img{
+  background-image: url('../public/elmo.png');
+  width: 48px;
+  height: 23px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.elmo-display-row{
+  position: absolute;
+  left: 0;
 }
 
 
