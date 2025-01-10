@@ -5,6 +5,8 @@ import { useState, useEffect, useRef } from "react";
 import Shop from "./Shop";
 import Shield from "./Shield";
 import Elmo from "./Elmo";
+import HomeScreen from "./HomeScreen";
+import Timer from "./Timer";
 
 
 function CookieClicker(){
@@ -12,7 +14,7 @@ function CookieClicker(){
     const [score, setScore] = useState(0);
     const [helper, setHelper] = useState(0);
     const [level, setLevel] = useState(1);
-    const [helperLevel, setHelperLevel] = useState(2);
+    const [helperLevel, setHelperLevel] = useState(1);
     const [potion, setPotion] = useState(1);
     const [shieldActive, setShieldActive] = useState(false);
     const [shieldTime, setShieldTime] = useState(0);
@@ -23,10 +25,11 @@ function CookieClicker(){
     const [elmoCollision, setElmoCollision] = useState(false);
     const shieldActiveRef = useRef(shieldActive);
     const effectIntervalRef = useRef(null);
-
-    
-    
-
+    const [gameStarted, setGameStarted] = useState(false);
+    const [gameTimer, setGameTimer] = useState(0); 
+    const [timer, setTimer] = useState(0); 
+    const [intervalId, setIntervalId] = useState(null); 
+    const [gameOverText, setGameOverText] = useState("🖱️ Welcome to the ultimate Cookie Clicker 🍪");
     const elmoEffectLevel = 2;
     const elmoEffectTime = 10;
     const upgradeHelperPrice = 250;
@@ -50,7 +53,63 @@ function CookieClicker(){
             items: [{name: "5s", price: fiveSecShieldPrice, available: true, onClick: onFiveSecShield},
                     {name: "10s", price: tenSecShieldPrice, available: true, onClick: onTenSecShield}]}
     ]);
-    
+
+    useEffect(() => {
+      if (gameStarted) {
+        const interval = setInterval(() => {
+          setTimer((prev) => prev + 1);
+        }, 1000);
+        setIntervalId(interval);
+      } else {
+        setGameTimer(timer);
+        if (intervalId) {
+          clearInterval(intervalId);
+          setIntervalId(null);
+        }
+      }
+      return () => {
+        if (intervalId) {
+          clearInterval(intervalId);
+        }
+      };
+    }, [gameStarted]);
+
+    function gameWon(){
+      setGameStarted(false);
+      resetGame();
+      setGameOverText("🙌 Congratulations 🎉");
+    }
+
+    function gameLost(){
+      setGameStarted(false);
+      resetGame();
+      setGameOverText("🥹 Maybe next time 👎");
+    }
+
+    function resetGame(){
+      clearEffectInterval();
+      setElmoCollision(false);
+      setShieldActive(false);
+      setPotion(1);
+      setElmos([]);
+      setScore(0);
+      setHelper(0);
+      setHelperLevel(2);
+      setLevel(1);
+      enableShopItem("Helper", "+");
+      enableShopItem("Helper", "⬆");
+    }
+
+    useEffect(() => {
+      console.log(timer);
+    }, [timer])  
+
+    function onStartGame(){
+      setTimer(0);
+      setElmos([]);
+      setGameStarted(true);
+      console.log(gameStarted);
+    }
     
     async function onTenSecShield(){
         if(await enoughScore(tenSecShieldPrice)){
@@ -217,34 +276,29 @@ function CookieClicker(){
 
 
     function onCookieClick(){
-        if(score < 1000 - (1 * helperLevel * helper * potion) && level <= levelAmount){
-            if(helper > 0){
-                setScore(score + (1 * helperLevel * helper * potion));
-            } else{
-                setScore(score + (1 * potion));
-            }
-        } else if (score >= 1000 - (1 * helperLevel * helper * potion) && level < levelAmount){
-            setLevel(level + 1);
-            setElmos([]);
-            setScore(0);
-        } else if (score >= 1000 - (1 * helperLevel * helper * potion) && level === levelAmount){
-            setElmos([]);
-            alert("Congratulations!!");
-            setScore(0);
-            setHelper(0);
-            setLevel(1);
-            enableShopItem("Helper", "+");
-            enableShopItem("Helper", "⬆");
-        }
-        
+      if(score < 1000 - (1 * helperLevel * helper * potion) && level <= levelAmount){
+          if(helper > 0){
+              setScore(score + (1 * helperLevel * helper * potion));
+          } else{
+              setScore(score + (1 * potion));
+          }
+      } else if (score >= 1000 - (1 * helperLevel * helper * potion) && level < levelAmount){
+          setLevel(level + 1);
+          setElmos([]);
+          setScore(0);
+      } else if (score >= 1000 - (1 * helperLevel * helper * potion) && level === levelAmount){
+          gameWon();
+        } 
     }
 
     useEffect(() => {
         generateElmoArray();
-    }, [])
+    }, [gameStarted])
 
     useEffect(() => {
-        generateElmoArray();
+      setElmoCollision(false);
+      clearEffectInterval(); 
+      generateElmoArray();
     }, [level])
 
     useEffect(() => {
@@ -252,9 +306,9 @@ function CookieClicker(){
         const elmoElements = document.querySelectorAll('.elmo');
         if(elmoElementsLength > 0){
             elmoElements.forEach((elmo) => {
-                elmo.style.animation = 'none'; // Remove the animation
-                void elmo.offsetWidth;        // Force a reflow (browser recalculates styles)
-                elmo.style.animation = 'moveToCenter 4s ease-in-out forwards'; // Reapply the animation
+                elmo.style.animation = 'none'; 
+                void elmo.offsetWidth;       
+                elmo.style.animation = 'moveToCenter 4s ease-in-out forwards'; 
             });
         }
         calcElmoStartingPosition();
@@ -298,21 +352,20 @@ function CookieClicker(){
     function calcElmoStartingPosition(){
         elmos.forEach((elmo) => {
             const elmoElement = document.getElementById(elmo.id);
+            if(elmoElement){
             const rect = elmoElement.getBoundingClientRect();
             const startX = rect.left;
             elmoElement.style.setProperty('--elmo-start-x', `${startX}px`);
             elmoElement.style.animation = 'none';
             void elmoElement.offsetWidth; 
             elmoElement.style.animation = 'moveToCenter 4s ease-in-out forwards';
+          }
             });
         
     }
 
-    
-      
-
     useEffect(() => {
-        shieldActiveRef.current = shieldActive; // Update the ref whenever shieldActive changes
+        shieldActiveRef.current = shieldActive; 
       }, [shieldActive]);
 
 
@@ -335,15 +388,12 @@ function CookieClicker(){
           if (isColliding) {
             const elmoId = elmo.getAttribute('id');
             if (!elmoCollision && !shieldActiveRef.current) {
-              console.log("Effect starts");
               setElmoCollision(true);
               onElmoClick(elmoId);
               elmoEffectApplication();
             } else if (elmoCollision) {
-              console.log("Effect already applies");
               onElmoClick(elmoId);
             } else if (shieldActiveRef.current) {
-              console.log("Shield is active");
               onElmoClick(elmoId);
             }
           }
@@ -353,11 +403,9 @@ function CookieClicker(){
 
       function elmoEffectApplication() {
         clearEffectInterval();
-        console.log("Effect starts");
         const interval = setInterval(() => {
           setElmoSec(prevSeconds => {
             if (prevSeconds + 1 === elmoEffectTime) {
-              console.log("Effect over");
               setElmoCollision(false);
               clearEffectInterval(); 
               return 0; 
@@ -376,61 +424,51 @@ function CookieClicker(){
         }
       }
     
-
     function elmoEffect(){
       setScore((prev) => {
-        if(prev - helperLevel >= 0){
-          return prev - helperLevel;
-        } else if(prev - helperLevel < 0){
-          setElmos([]);
-            alert("You loose :(");
-            setElmos([]);
-            setElmoCollision(false);
-            setScore(0);
-            setHelper(0);
-            setLevel(1);
-            enableShopItem("Helper", "+");
-            enableShopItem("Helper", "⬆");
+        if(prev - (elmoEffectLevel * (Math.floor(level/2)) + 1) >= 0){
+          return prev - (elmoEffectLevel * (Math.floor(level/2)) + 1);
+        } else if(prev - (elmoEffectLevel * (Math.floor(level/2)) + 1) < 0){
+          gameLost();
         }
       });
     }
 
     useEffect(() => {
         return () => clearEffectInterval();
-      }, []);
-    
-  
-    
-    
+      }, [gameStarted]);
     
 
-
-
-
-
-    return <div>
-        {shieldActive && <Shield score={score} />}
-        <Shop list={shopList}/>
-        <Cookie score={score} onCookieClick={onCookieClick}/>
-        <Scoreboard score={score} level={level} levelAmount={levelAmount}
-                    helpers={helper} potion={potion} potionTime={potionTime}
-                    shieldTime={shieldTime} shieldActive={shieldActive}
-                    helperLevel={helperLevel} elmoTime={elmoEffectTime} elmoActive={elmoCollision}/> 
-        
-        {elmos.map((e) => (
-        <Elmo
-          key={e.id}
-          id={e.id}
-          left={e.left}
-          onClick={onElmoClick} 
-        />
-      ))}
-        
-        
-        
-        
-     
-    </div>;
-}
+return (
+        <div>
+          {gameStarted ? (
+            <>
+              {shieldActive && <Shield score={score} />}
+              <Shop list={shopList} />
+              <Cookie score={score} onCookieClick={onCookieClick} />
+              <Timer timer={timer}/>
+              <Scoreboard
+                score={score}
+                level={level}
+                levelAmount={levelAmount}
+                helpers={helper}
+                potion={potion}
+                potionTime={potionTime}
+                shieldTime={shieldTime}
+                shieldActive={shieldActive}
+                helperLevel={helperLevel}
+                elmoTime={elmoEffectTime}
+                elmoActive={elmoCollision}
+              />
+              {elmos.map((e) => (
+                <Elmo key={e.id} id={e.id} left={e.left} onClick={onElmoClick} />
+              ))}
+            </>
+          ) : (
+            <HomeScreen text={gameOverText} timer={gameTimer} onClick={onStartGame}/>
+          )}
+        </div>
+      );
+    };
 
 export default CookieClicker;
