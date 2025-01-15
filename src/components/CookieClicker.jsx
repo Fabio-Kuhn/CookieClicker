@@ -14,24 +14,26 @@ function CookieClicker(){
     const [score, setScore] = useState(0);
     const [helper, setHelper] = useState(0);
     const [level, setLevel] = useState(1);
-    const [helperLevel, setHelperLevel] = useState(1);
-    const [potion, setPotion] = useState(1);
-    const [shieldActive, setShieldActive] = useState(false);
+    const [helperLevel, setHelperLevel] = useState(2);
+    const [potion, setPotion] = useState(1); 
+    const [shieldActive, setShieldActive] = useState(false); 
     const [shieldTime, setShieldTime] = useState(0);
     const [elmos, setElmos] = useState([]);
     const [elmoRender, setElmoRender] = useState(0);
     const [seconds, setSeconds] = useState(0);
     const [elmoSec, setElmoSec] = useState(0);
-    const [elmoCollision, setElmoCollision] = useState(false);
+    const [elmoCollision, setElmoCollision] = useState(false); 
     const shieldActiveRef = useRef(shieldActive);
     const effectIntervalRef = useRef(null);
+
     const [gameStarted, setGameStarted] = useState(false);
+
     const [gameTimer, setGameTimer] = useState(0); 
     const [timer, setTimer] = useState(0); 
     const [intervalId, setIntervalId] = useState(null); 
-    const [gameOverText, setGameOverText] = useState("🖱️ Welcome to the ultimate Cookie Clicker 🍪");
-    const elmoEffectLevel = 2;
-    const elmoEffectTime = 10;
+    const [gameOverText, setGameOverText] = useState("Welcome to the ultimate Cookie Clicker");
+    const elmoEffectLevel = 2; 
+    const elmoEffectTime = 10; 
     const upgradeHelperPrice = 250;
     const buyHelperPrice = 100;
     const timesTwoPotionPrice = 50;
@@ -40,7 +42,6 @@ function CookieClicker(){
     const fiveSecShieldPrice = 400;
     const tenSecShieldPrice = 600;
     const potionTime = 5000;
-
     const [shopList, setShopList] = useState([
         {title: "Helper",
             items: [{name: "⬆", price: upgradeHelperPrice, available: true,  onClick: onUpgradeHelper},
@@ -53,6 +54,14 @@ function CookieClicker(){
             items: [{name: "5s", price: fiveSecShieldPrice, available: true, onClick: onFiveSecShield},
                     {name: "10s", price: tenSecShieldPrice, available: true, onClick: onTenSecShield}]}
     ]);
+
+    window.addEventListener('resize', windowResize);
+
+    function windowResize(){
+      if(gameStarted === true){
+        windowResized();
+      }
+    }
 
     useEffect(() => {
       if (gameStarted) {
@@ -86,6 +95,12 @@ function CookieClicker(){
       setGameOverText("🥹 Maybe next time 👎");
     }
 
+    function windowResized(){
+      setGameStarted(false);
+      resetGame();
+      setGameOverText("🥹 Window has been resized 👎");
+    }
+
     function resetGame(){
       clearEffectInterval();
       setElmoCollision(false);
@@ -100,15 +115,10 @@ function CookieClicker(){
       enableShopItem("Helper", "⬆");
     }
 
-    useEffect(() => {
-      console.log(timer);
-    }, [timer])  
-
     function onStartGame(){
       setTimer(0);
       setElmos([]);
       setGameStarted(true);
-      console.log(gameStarted);
     }
     
     async function onTenSecShield(){
@@ -185,8 +195,7 @@ function CookieClicker(){
     async function onBuyHelper(){
         if(await enoughScore(buyHelperPrice)){
             deductScore(buyHelperPrice);
-            setHelper((prevHelper) => {
-                console.log('Previous Helper:', prevHelper);  
+            setHelper((prevHelper) => { 
                 if (prevHelper < 2) {
                     return prevHelper + 1;
                 } else {
@@ -203,8 +212,7 @@ function CookieClicker(){
     async function onUpgradeHelper(){
         if(await enoughScore(upgradeHelperPrice)){
             deductScore(upgradeHelperPrice);
-            setHelperLevel((prevHelperLvl) => {
-                console.log('Previous Helper Level:', prevHelperLvl);  
+            setHelperLevel((prevHelperLvl) => { 
                 if (prevHelperLvl < 4) {
                     return prevHelperLvl + 1;
                 } else {
@@ -426,11 +434,21 @@ function CookieClicker(){
     
     function elmoEffect(){
       setScore((prev) => {
-        if(prev - (elmoEffectLevel * (Math.floor(level/2)) + 1) >= 0){
-          return prev - (elmoEffectLevel * (Math.floor(level/2)) + 1);
-        } else if(prev - (elmoEffectLevel * (Math.floor(level/2)) + 1) < 0){
-          gameLost();
+        if(level <= 2){
+          if(prev - (elmoEffectLevel * (Math.floor(level/2)) + 1) >= 0){
+            return prev - (elmoEffectLevel * (Math.floor(level/2)) + 1);
+          } else if(prev - (elmoEffectLevel * (Math.floor(level/2)) + 1) < 0){
+            gameLost();
+          }
+        } else{
+          if(prev - (elmoEffectLevel * (Math.floor(level * 4)) + 1) >= 0){
+            return prev - (elmoEffectLevel * level * 4);
+          } else if(prev - (elmoEffectLevel * level * 4) < 0){
+            gameLost();
+          }
         }
+
+        
       });
     }
 

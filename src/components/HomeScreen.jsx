@@ -7,7 +7,7 @@ function HomeScreen(props){
 
     return <div className="home-screen-div">
         <h1 className="home-screen-text">{props.text}</h1>
-        <p className="home-screen-timer">{minutes}:{seconds}</p>
+        <p className="home-screen-timer">{ timer === 0 ? "🖱️🍪" : minutes+":"+seconds}</p>
         <button className="home-screen-button" onClick={() => props.onClick()}>play</button>
     </div>
 }

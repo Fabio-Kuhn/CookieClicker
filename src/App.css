@@ -60,7 +60,7 @@ body {
   height: 40px;
   background-color: white;
   border: 1px solid black;
-  border-radius: 20px 20px 20px 20px;
+  border-radius: 20px;
   align-items: center;
   justify-content: center;
   z-index: 3;
@@ -103,8 +103,13 @@ h2{
   height: 100vh;
   background-color: white;
   border-right: 1px solid black;
-  border-radius: 0 2% 2% 0; 
+  border-radius: 0 2% 2% 0;
+  z-index: 3;
 } 
+
+.shopContainer h3{
+  padding-left: 10px;;
+}
 
 .shop-row-container{
   box-sizing: border-box;
@@ -225,6 +230,8 @@ h2{
   position: absolute;
   right: 69%;
   top: 7px;
+  font-weight: 900;
+  font-family: sans-serif;
 }
 
  @keyframes moveToCenter {
@@ -327,3 +334,127 @@ h2{
 .home-screen-button:hover{
   background-color: rgb(231, 231, 231);
 }
+
+@media (orientation: portrait) {
+  .shopContainer{
+    padding-top: 35px;
+    width: 100vw;
+    height: auto;
+    background-color: white;
+    display: inline-flex;
+    flex-direction: row;
+    z-index: 2;
+    border-bottom: 1px solid black;
+  }
+  .shop-row-container:nth-child(3),
+  .shop-row-container:nth-child(4) {
+    border-left: 1px solid black;
+  }
+  .shop-row-container{
+    box-sizing: border-box;
+    width: 33.3333333%;
+    padding: 10px 0px;
+    text-align: center;
+  }
+  .shop-item{
+    width: 35px;
+    height: 35px;
+  }
+  .shopContainer h3{
+    position: absolute;
+    top: -12px;
+    left: 10px;
+  }
+  .demonstration{
+    font-size: 10px;
+  }
+  .scoreboard{
+    width: 100vw;
+    left: 0;
+  }
+  .perk-display-container{
+    height: 40px;
+    width: 165px;
+    top: 0;
+  }
+  .helper-display-row{
+    height: 40px;
+    width: 45px; 
+  }
+  .perk-display-row{
+    height: 40px;
+    width: 40px;
+  }
+  .perk-display{
+    height: 25px;
+    margin: 0px;
+    width: 15px;
+  }
+  .helper-level-display{
+    position: absolute;
+    margin: 0px;
+    height: 10px;
+    top: 28px;
+    right: 66.666%;
+    margin-right: 20px;
+    font-weight: 900;
+  }
+  .elmo-display-row{
+    position: absolute;
+    bottom: -6px;
+  }
+  .shield-display-row{
+    left: 40px;
+  }
+}
+
+@media (max-width: 1280px){
+  .demonstration{
+    font-size: 10px;
+  }
+  .scoreboard{
+    width: 100vw;
+    left: 0;
+  }
+  .perk-display-container{
+    height: 40px;
+    width: 165px;
+    top: 0;
+  }
+  .helper-display-row{
+    height: 40px;
+    width: 45px; 
+  }
+  .perk-display-row{
+    height: 40px;
+    width: 40px;
+  }
+  .perk-display{
+    height: 25px;
+    margin: 0px;
+    width: 15px;
+  }
+  .helper-level-display{
+    position: absolute;
+    margin: 0px;
+    height: 10px;
+    top: 28px;
+    right: 66.666%;
+    margin-right: 20px;
+    font-weight: 900;
+  }
+  .elmo-display-row{
+    position: absolute;
+    bottom: -6px;
+  }
+  .shield-display-row{
+    left: 40px;
+  }
+}
+
+@media(max-width: 680px){
+  .scoreboard-categories{
+    display: none;
+  }
+}
+
